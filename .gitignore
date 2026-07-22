@@ -1,0 +1,23 @@
+# Ollama data (non versionare i modelli!)
+~/.ollama/models/
+~/.ollama/cache/
+
+# Files di configurazione locali sensibili
+~/.pi/ollama-server-config.json
+~/.pi/config/*.json
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+__MACOSX/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# System
+node_modules/
+dist/

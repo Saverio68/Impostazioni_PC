@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<title>Impostazioni_PC — Riepilogo Configurazioni</title>
+<style>
+  :root { --bg: #0d1117; --card: #161b22; --border: #30363d; --text: #c9d1d9; --accent: #58a6ff; --green: #3fb950; --yellow: #d29922; --code-bg: #1c2128; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg); color: var(--text); max-width: 900px; margin: 40px auto; padding: 0 20px; line-height: 1.6; }
+  h1 { color: var(--accent); border-bottom: 1px solid var(--border); padding-bottom: 10px; }
+  h2 { color: var(--green); margin-top: 30px; }
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 20px; margin: 15px 0; }
+  code, pre { font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace; background: var(--code-bg); padding: 2px 6px; border-radius: 4px; font-size: 0.9em; }
+  pre { padding: 15px; overflow-x: auto; border: 1px solid var(--border); }
+  .param { color: var(--yellow); font-weight: bold; }
+  .val { color: var(--green); }
+  ul { padding-left: 20px; }
+  li { margin: 5px 0; }
+  table { border-collapse: collapse; width: 100%; margin: 10px 0; }
+  th, td { border: 1px solid var(--border); padding: 8px 12px; text-align: left; }
+  th { background: var(--code-bg); color: var(--accent); }
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 0.8em; margin-right: 5px; }
+  .ok { background: #238636; color: white; }
+  .info { background: #1f6feb; color: white; }
+</style>
+</head>
+<body>
+
+<h1>📋 Riepilogo Configurazioni — Impostazioni_PC</h1>
+
+<div class="card">
+  <strong>Piattaforma:</strong> Mac M4 (Apple Silicon) con 48 GB RAM<br>
+  <strong>Progetto:</strong> Impostazioni_PC<br>
+  <strong>Data configurazione:</strong> 23 Luglio 2025<br>
+  <strong>Git user:</strong> saverio-priori | s.priori@ifac.cnr.it
+</div>
+
+<h2>📁 File creati e modificati</h2>
+
+<h3>1. <code>~/.pi/ollama-server-config.json</code> — Nuova configurazione server Ollama</h3>
+<div class="card">
+  Configura il server Ollama per l'hardware disponibile. Ottimizzato per:
+  <ul>
+    <li>GPU Metal su Apple Silicon (inferenza automatica)</li>
+    <li>Condivisione della memoria RAM tra macOS e modelli LLM</li>
+    <li>Sessions di lavoro lunghe con inferenza continua</li>
+  </ul>
+  Parametri chiave:
+  <table>
+    <tr><th>Parametro</th><th>Valore</th><th>Spiegazione</th></tr>
+    <tr><td class="param">num_parallel</td><td class="val">1</td><td>Inferenza parallela (1 per ottimizzare Metal)</td></tr>
+    <tr><td class="param">max_runners</td><td class="val">1</td><td>Un solo runner attivo alla volta (controllo VRAM)</td></tr>
+    <tr><td class="param">release_after_inference_delay_ms</td><td class="val">60000</td><td>Modelli mantenuti in VRAM per 1 minuto dopo l'inferenza</td></tr>
+    <tr><td class="param">num_ctx (default)</td><td class="val">32768</td><td>Context window default bilanciato: molto più del default Ollama (8192)</td></tr>
+    <tr><td class="param">f16_kv</td><td class="val"><span class="badge ok">true</span></td><td>Chia chiavi/valori in F16 per precisione migliore</td></tr>
+    <tr><td class="param">use_mlock</td><td class="val"><span class="badge info">false</span></td><td>Non blocca la VRAM: macOS gestisce la condivisione della memoria</td></tr>
+    <tr><td class="param">num_thread</td><td class="val">0</td><td>Usa tutti i core disponibili (auto-cpu_count)</td></tr>
+    <tr><td class="param">log_level</td><td class="val">info</td><td>Log sufficienti per debug senza rumore</td></tr>
+  </table>
+</div>
+
+<h3>2. <code>~/.pi/agent/models.json</code> — Modelli allineati e parametri ottimizzati</h3>
+<div class="card">
+  File aggiornato con tutti i modelli Ollama installati e parametri ottimizzati per coding sessions lunghe.
+  <ul>
+    <li><span class="badge ok">Aggiorno</span> Parametri in <code>options</code>: temperatura, top_p, num_predicit, num_ctx allineati alle esigenze di coding</li>
+    <li>Allineato con l'output di <code>ollama ls</code></li>
+  </ul>
+
+  <h4>Modelli configurati:</h4>
+  <table>
+    <tr><th>Modello</th><th>Ramishe Dimensione</th><th>contextWindow</th><th>maxTokens</th><th>num_ctx</th><th>temperature</th><th>n. predicit</th></tr>
+    <tr><td><strong>qwen3.6:latest</strong> <em>(default)</em></td><td>23 GB</td><td>131072</td><td>65536</td><td title="Window di contesto attiva">131072</td><td title="Bassa = deterministica, ideale coding">0.2</td><td>65536</td></tr>
+    <tr><td><strong>qwen3-coder:latest</strong></td><td>18 GB</td><td>131072</td><td>65536</td><td>65536</td><td>0.2</td><td>65536</td></tr>
+    <tr><td><strong>qwen3-coder:30b</strong></td><td>18 GB</td><td>32768</td><td>32768</td><td>32768</td><td>0.2</td><td>32768</td></tr>
+    <tr><td><strong>qwen3-coder:latest</strong></td><td>19 GB</td><td>131072</td><td>65536</td><td>65536</td><td>0.2</td><td>8192</td></tr>
+    <tr><td><strong>qwen3-coder:latest</strong> <em>(visione)</em></td><td>6 GB</td><td>18 GB - 35B-q4_K_M</title">7.8 GB</td><td>32768</td><td>4096</td><td>65536</td><td>0.5</td><td>4096</td></tr>
+    <tr title="DeepSeek R1: modello con ragionamento complesso">
+      <td><strong>qwen3-coder:latest</strong></td><td>18 GB</td><td>131072</td><td>65536</td><td>131072</td><td>0.2</td><td">19 GB</td><td>65536</td></tr>
+    <tr><td><strong>llama3.2-vision:latest</strong></td><td>7.8 GB</td><td>32768</td><td>4096</td><td>32768</td><td>0.5</td><td>4096</td></tr>
+    <tr><td><strong>qwen3-vl:latest</strong></td><td>6.1 GB</td><td>131072</td><td>8192</td><td>65536</td><td>0.5</td><td>8192</td></tr>
+    <tr><td><strong>glm-ocr:latest</strong></td><td>2.2 GB</td><td>32768</td><td>4096</td><td>32768</td><td>0.5</td><td>4096</td></tr>
+  </table>
+
+  <h4>Note sui parametri chiave:</h4>
+  <ul>
+    <li><span class="param">input</span>: <code>["text"]</code> per testuale, <code>["text", "image"]</code> per vision (LLaMA3.2, Qwen3-VL, GLM-OCR)</li>
+    <li><span class="param">reasoning</span>: true per modelli con reasoning attivo (Qwen3, DeepSeek R1, Ornith)</li>
+    <li><span class="param">num_ctx</span>: context window dinamica per ogni modello, mai inferiore a 32K dove possibile</li>
+    <li><span class="param">temperature</span>: 0.2 per coding (consistente e deterministico), 0.5 per vision (più flessibile)</li>
+    <li><span class="param">top_p</span>: 0.9 standard per tutti i modelli — bilanciamento tra diversità e coerenza</li>
+    <li><span class="param">maxTokens</span>: allineato al context window o a limiti ragionevoli specifici del modello, garantendo output lunghi senza truncature premature</li>
+    <li><span class="param">num_predict</span>: pari a maxTokens per evitare truncatura anticipata</li>
+  </ul>
+</div>
+
+<h2>🔧 Note sulle scelte di configurazione</h2>
+
+<div class="card">
+  <h3>Perché questi parametri per coding sessions lunghe?</h3>
+  <ul>
+    <li><strong>num_ctx=131072</strong>: Context window massimizzata dove possibile (48 GB RAM permettono ampi context senza swap)</li>
+    <li><strong>temperature=0.2</strong>: Bassa temperatura per output consistenti e replicabili — cruciale per coding</li>
+    <li><strong>temperature=0.5</strong> per vision: maggiore flessibilità nell'interpretazione di immagini/grafici</li>
+    <li><strong>n. predicit = maxTokens</strong>: Nessun limite artificioso all'output — i modelli possono generare quanto necessario</li>
+    <li><strong>use_mlock=false</strong>: macOS deve condividere la memoria tra process; il blocco VRAM causerebbe OOM su 48GB</li>
+    <li><strong>release_after_inference_delay=60s</strong>: I modelli rimangono in VRAM per 1 minuto — riduce il tempo di loading quando si switcha velocemente tra progetti</li>
+  </ul>
+</div>
+
+<h2>🌐 Deployment Git</h2>
+
+<div class="card">
+  <p>Tutti i file sono pronti per il deploy.</p>
+  
+  <h3>Rappresentativi (remotes):</h3>
+  <table>
+    <tr><th>Repository</th><th>URL</th><th>Stato configurato</th></tr>
+    <tr><td>IFAC CNR GitLab</td><td><code>https://git.ifac.cnr.it/Impostazioni_PC</code></td><td><span class="badge info">DA DEFINIRE</span></td></tr>
+    <tr><td>GitHub (Saverio68)</td><td><code>https://github.com/Saverio68/Impostazioni_PC.git</code></td><td><span class="badge info">DA DEFINIRE</span></td></tr>
+  </table>
+  
+  <h3>.gitignore incluso:</h3>
+  <pre>
+# Ollama data (non versionare i modelli!)
+~/.ollama/models/
+~/.ollama/cache/
+
+# Files di configurazione locali sensibili
+~/.pi/ollama-server-config.json
+~/.pi/config/*.json
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# System
+node_modules/
+dist/</pre>
+</div>
+
+<h2>🚀 Comandi post-clonazione</h2>
+
+<div class="card">
+  <pre>
+# Dopo il clone e la configurazione Git:
+
+# Installa i modelli Ollama (se non presenti)
+ollama pull qwen3.6:latest
+ollama pull qwen3-coder:latest
+ollama pull ornith:35b-q4_K_M
+ollama pull deepseek-r1:32b
+ollama pull llama3.2-vision:latest
+ollama pull qwen3-vl:latest
+ollama pull glm-ocr:latest
+
+# Verifica i modelli
+ollama ls
+
+# Applica la configurazione server Ollama in ~/.pi/agent/models.json</pre>
+</div>
+
+<p style="text-align: center; margin-top: 40px; color: #8b949e;">
+  Configuraioni generate automaticamente per Impostazioni_PC — Mac M4 48GB<br>
+  <em>s.priori@ifac.cnr.it · Luglio 2025</em>
+</p>
+
+</body>
+</html>
