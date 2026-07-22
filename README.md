@@ -1,108 +1,40 @@
-# Impostazioni_PC
+# Impostazioni_PC — Mac M4 48GB (Ollama & pi coding agent)
 
-Configurazioni locali di **Ollama** e del **pi coding agent** per un ambiente Mac M4 (Apple Silicon) con 48 GB RAM.
+Questo repository gestisce le configurazioni e la documentazione per sincronizzare l'ambiente locale (**Ollama server** + **pi agent**) tramite il progetto "Impostazioni_PC". Non include il codice di applicazione, ma solo setup operativo.
 
----
-
-## 📌 Scope del progetto
-
-Questo repository contiene solo i file di configurazione necessari per sincronizzare l'ambiente di lavoro con il server Ollama locale. Non include né genera codice — è puramente infrastrutturale:
-
-- **Server Ollama config** → ottimizza inferenza per Mac M4 48GB
-- **Agent models config** (pi coding agent) → mappa tutti i modelli disponibili con i loro parametri
-- **Documentazione HTML** → riepilogo visivo delle configurazioni applicate
-- **.gitignore** → protegge dati sensibili e pesanti
-
----
-
-## 🗂️ Struttura dei files
-
-```
+## 📁 Struttura Files
+```text
 Impostazioni_PC/
-├── settings.md            # Istruzioni originali (non modificare)
-├── Readme.html            # Riepilogo visivo configurazioni
-├── README.md              # Questo file
-├── updating_plan.md       # Guida aggiornare modili Ollama e sync config
-└── .gitignore             # Esclude modelli, dati sensibili, etc.
+├── settings.md           # Istruzioni originali (non modificare)
+├── Readme.html           # Riepilogo visivo dinamico delle configurazioni
+├── README.md             # Questo file
+├── updating_plan.md      # Procedura manuale e script per gestire modelli Ollama
+└── scripts/              # Script di automazione
+    └── config-update.py  # Python script: rigenera JSON + HTML allineati a 'ollama ls'
 ```
 
-### Files non-versionati (su disco locale)
+## 🤖 Gestione Modelli e Automazione
+Hai due opzioni per aggiornare le configurazioni dopo aver aggiunto o rimosso modelli da Ollama:
 
-| File | Percorso locale | Descrizione |
+1. **Automatizzato (Raccomandato):** Esegui semplicemente `python3 scripts/config-update.py` dalla root della repo. Lo script rileterà `ollama list`, calcolerà i valori ottimali per il tuo Mac M4 48GB e sovrascriverà `Readme.html` e `~/.pi/agent/models.json`.
+2. **Manuale:** Segui `updating_plan.md` per intervenire manualmente sui file JSON di configurazione e aggiornare la documentazione HTML a mano.
+
+## 📘 Glossario Tecnico (Termini Configurazione)
+I parametri qui definiti controllano l'inferenza su sessioni pesanti:
+
+| Termine | Definizione tecnica | Valore attuale nel nostro setup |
 |---|---|---|
-| Server Config | `~/.pi/ollama-server-config.json` | Parametri server Ollama |
-| Agent Models | `~/.pi/agent/models.json` | Lista + parametri ogni modello |
+| `num_predict` | Il "cappello" massimo di token scritti durante la generazione. | **65536**: impostato altissimo per evitare interruzioni premature (sopra 4096 default Ollama) su sessioni lunghe di coding. |
+| `contextWindow` | Dimensione massima della memoria logica del modello. | **131k**: sfruttiamo l'hardware Mac M4 moderno per mantenere tutto il contesto in RAM. |
+| `num_ctx` | Finestra attiva sulla GPU/Metal (effettivo costo in VRAM/RAM). | **65536** o uguale a num_predict. Calibrato per stabilità e velocità su 48GB unificati. |
+| `temperature` | Creatività/Disperazione dei tokens generati. | **0.2** per Coding (sicuro), **0.5** per Vision (adattivo). |
 
----
+## 🔑 Parametri chiave Ollama Server (`~/.pi/ollama-config.json`)
+- **`f16_kv: true`**: Precisione 16-bit per la memoria delle chiavi (KV Cache). Fondamentale per stabilità su Mac M4.
+- **`release_after_inference_delay_ms`**: Tempo di permanenza del modello in GPU prima di scaricarlo. Impostato a 60s per velocizzare switch rapidi tra task.
 
-## 🧭 Come usare l'Updating Plan
+> 🧠 **Nota specifica su `num_predict`**: Se impostato basso (come il default Ollama), il modello si "zittirà" e fermerà la generazione anche se non ha finito il codice o la spiegazione logica. Su sessioni di lavoro lunghi, un valore alto è essenziale per integrità dell'output.
 
-Quando cambi modelli sul server Ollama (aggiungi, rimuovi o modifica i parametri), usa [`updating_plan.md`](updating_plan.md) come procedura guidata.
-
-### Riepilogo rapido:
-
-1. **Aggiungere un modello** → `ollama pull <model>` → aggiungi a models.json → commit
-2. **Rimuovere un modello** → `ollama rm <model>` → rimuovi da models.json + README → commit
-3. **Modificare parametri** → edita il blocco nel JSON dell modello → aggiorna Readme.html → commit
-4. Ogni volta che modifichi: esegui la [checklist rapida](updating_plan.md#5-checklist-rapida-di-verifica) prima del commit
-
-### Backup automatico consigliato
-
-Prima di qualsiasi modifica ai JSON, fai un backup:
-
-```bash
-cp ~/.pi/agent/models.json ~/.pi/agent/models.json.bak.$(date +%Y%m%d)
-```
-
----
-
-## 🔑 Parametri Chiave (spiegati)
-
-| Parametro | Descrizione | Valore default usato |
-|---|---|---|
-| `contextWindow` | Finestrali contesto massima in token | 131072 dove possibile |
-| `maxTokens` | Token massimi che il modello puo generare per risposta | Pari a contextWindow o limite inferiore |
-| `num_ctx` | Numero di token effettivi nel sliding window attiva. Deve essere ≤ contextWindow | 65536 / 131072 |
-| `temperature` | Creativity del modello: 0 = determinista, 1 = casuale | **0.2** per coding, **0.5** per vision |
-| `top_p` | Nucleo sampling; filtra tokens con probabilità cumulativa < p | 0.9 (standard) |
-
----
-
-## 🌐 Repository Remoti
-
-L'ambiente sincronizzato su due piattaforme:
-
-| Remote | URL | Scopo |
-|---|---|---|
-| **origin** (GitHub) | `github.com/Saverio68/Impostazioni_PC` | Backup e accessibilita internazionale |
-| **ifac** (IFAC CNR) | `git.ifac.cnr.it/priori/impostazioni_pc` | Ambiente institutional / dipartimentale |
-
-Comandi push:
-```bash
-git push origin master    # push su GitHub
-git push ifac master      # push su IFAC CNR GitLab
-```
-
----
-
-## ⚙️ Hardware di riferimento
-
-| Componente | Specifica |
-|---|---|
-| CPU / GPU | Apple M4 (Metal) |
-| RAM | 48 GB unificata |
-| OS | macOS Sonoma / Sequoia |
-| Server Ollama | `/Users/saverio/.ollama/` |
-| Agent Pi | `~/.pi/` |
-
----
-
-## ⚠️ Avvertenze importanti
-
-1. **Non committare segreti o tokens API** — se un giorno dovessi inserire chiavi, usa variabili d'ambiente esterne. I JSON nel repo sono solo config pubbliche/operative.
-2. **I files di configurazione Ollama risiedono su disco locale** (`~/.pi/ollama-server-config.json`) e non nel repo; il repo contiene solo copie/reference delle configurazioni applicate.
-3. Il backup dei JSON è consigliato prima di ogni modifica manuale: `updating_plan.md` spiega come fare.
-
----
-
-*Configuraioni per Mac M4 48GB — s.priori@ifac.cnr.it — Luglio 2026*
+## ⚠️ Avvertenze Importanti
+- **Non committare mai segreti** (API keys), né i pesanti files binari dei modelli (`~/.ollama/models/` è già escluso da `.gitignore`). I JSON sono solo riferimenti operativi.
+- **RAM su Mac M4**: 48 GB Unificati. Questo ci permette di avere `num_ctx` enormi (65k+) che sui computer normali crasherebbero l'applicazione immediata.

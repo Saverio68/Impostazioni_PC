@@ -2,230 +2,139 @@
 <html lang="it">
 <head>
 <meta charset="UTF-8">
-<title>Impostazioni_PC — Riepilogo Configurazioni</title>
+<title>Riepilogo Configurazioni - Impostazioni_PC</title>
 <style>
-  :root { --bg: #0d1117; --card: #161b22; --border: #30363d; --text: #c9d1d9; --accent: #58a6ff; --green: #3fb950; --yellow: #d29922; --code-bg: #1c2128; }
-  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg); color: var(--text); max-width: 900px; margin: 40px auto; padding: 0 20px; line-height: 1.6; }
-  h1 { color: var(--accent); border-bottom: 1px solid var(--border); padding-bottom: 10px; }
-  h2 { color: var(--green); margin-top: 30px; }
-  .card { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 20px; margin: 15px 0; }
-  code, pre { font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace; background: var(--code-bg); padding: 2px 6px; border-radius: 4px; font-size: 0.9em; }
-  pre { padding: 15px; overflow-x: auto; border: 1px solid var(--border); }
-  .param { color: var(--yellow); font-weight: bold; }
-  .val { color: var(--green); }
-  ul { padding-left: 20px; }
-  li { margin: 5px 0; }
-  table { border-collapse: collapse; width: 100%; margin: 10px 0; font-size: 0.9em; }
-  th, td { border: 1px solid var(--border); padding: 8px 12px; text-align: left; vertical-align: top; }
-  th { background: var(--code-bg); color: var(--accent); white-space: nowrap; }
-  tr:nth-child(even) td { background-color: #0d111744; }
-  .badge { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 0.8em; margin-right: 5px; vertical-align: middle; }
-  .ok { background: #238636; color: white; }
-  .info { background: #1f6feb; color: white; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background: #0d1117; color: #c9d1d9; padding: 20px; max-width: 950px; margin: auto; line-height: 1.5; }
+  h1 { color: #58a6ff; border-bottom: 1px solid #30363d; padding-bottom: 10px; }
+  h2 { color: #3fb950; margin-top: 40px; }
+  .card { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 20px; margin-bottom: 20px; }
+  
+  table { border-collapse: collapse; width: 100%; color: white; font-size: 0.9em; }
+  th, td { border: 1px solid #30363d; padding: 10px 14px; text-align: left; vertical-align: top; }
+  th { background-color: #21262d; color: #58a6ff; white-space: nowrap; }
+  tr:nth-child(even) td { background-color: #0d111733; }
+  
+  .badge { display: inline-block; padding: 3px 9px; border-radius: 12px; font-size: 0.8em; font-weight: bold; vertical-align: middle; margin-left: 5px; cursor: default; }
+  .ok-badge { background: #238636; color: white; } /* Green */
+  .no-badge { background: #1f6feb; color: white; } /* Blue */
+  
+  code, p code { font-family: 'SF Mono', Consolas, monospace; background: #1c2128; padding: 2px 5px; border-radius: 4px; font-size: 0.95em; color: #ffa657; }
+  
+  .param-desc li { margin-bottom: 8px; }
+  .appendix { background-color: #1e2a32; border-left: 5px solid #58a6ff; padding: 20px; margin-top: 40px; border-radius: 0 8px 8px 0; }
+  
+  footer { text-align: center; margin-top: 50px; color: #8b949e; font-size: 0.8em; border-top: 1px solid #30363d; padding-top: 10px; }
 </style>
 </head>
 <body>
 
-<h1>📋 Riepilogo Configurazioni — Impostazioni_PC</h1>
+<h1>📋 Riepilogo Configurazioni Ollama — Impostazioni_PC <span class="badge ok-badge">Auto-Synced</span></h1>
 
 <div class="card">
-  <strong>Piattaforma:</strong> Mac M4 (Apple Silicon) con 48 GB RAM<br>
-  <strong>Progetto:</strong> Impostazioni_PC<br>
-  <strong>Data configurazione:</strong> 23 Luglio 2025<br>
-  <strong>Git user:</strong> saverio-priori | s.priori@ifac.cnr.it
-</div>
-
-<h2>📁 File creati e modificati</h2>
-
-<h3>1. <code>~/.pi/ollama-server-config.json</code> — Nuova configurazione server Ollama</h3>
-<div class="card">
-  Configura il server Ollama per l'hardware disponibile. Ottimizzato per:
-  <ul>
-    <li>GPU Metal su Apple Silicon (inferenza automatica)</li>
-    <li>Condivisione della memoria RAM tra macOS e modelli LLM</li>
-    <li>Sessions di lavoro lunghe con inferenza continua</li>
-  </ul>
-  Parametri chiave:
-  <table>
-    <tr><th class="param">Parametro</th><th class="val">Valore</th><th>Spiegazione</th></tr>
-    <tr><td><b>num_parallel</b></td><td>1</td><td>Inferenza parallela (1 per ottimizzare Metal)</td></tr>
-    <tr><td><b>max_runners</b></td><td>1</td><td>Un solo runner attivo alla volta (controllo VRAM)</td></tr>
-    <tr><td><b>release_after_inference_delay_ms</b></td><td>60000</td><td>Modelli mantenuti in VRAM per 1 minuto dopo l'inferenza</td></tr>
-    <tr><td><b>num_ctx (default)</b></td><td>32768</td><td>Context window default: molto più del default Ollama (8192)</td></tr>
-    <tr><td><b>f16_kv</b></td><td><span class="badge ok">true</span></td><td>Chia chiavi/valori in F16 per precisione migliore</td></tr>
-    <tr><td><b>use_mlock</b></td><td><span class="badge info">false</span></td><td>Non blocca la VRAM; macOS gestisce la condivisione della memoria</td></tr>
-  </table>
-</div>
-
-<h3>2. <code>~/.pi/agent/models.json</code> — Modelli allineati e parametri ottimizzati</h3>
-<div class="card">
-  File aggiornato con tutti i modelli Ollama installati e parametri ottimizzati per coding sessions lunghe.
+  <p><strong>Piattaforma:</strong> 🖥️ Mac M4 (Apple Silicon) con 48 GB RAM Unificata<br>
+  <strong>Versione configurazione:</strong> Aggiornata automaticamente da <code>scripts/config-update.py</code></p>
   
-  <h4>Modelli configurati in dettaglio:</h4>
+  <h2>⚙️ 1. Parametri Server Ollama (<code>~/.pi/ollama-server-config.json</code>)</h2>
+  <table>
+    <tr><th>Parametro</th><th>Valore attuale</th><th>Ottimizzazione Hardware (48GB)</th></tr>
+    <tr><td><b>num_ctx (default)</b></td><td><code>32768</code></td><td>Tripla rispetto al default Ollama (8192). Sfrutta la RAM unificata.</td></tr>
+    <tr><td><b>f16_kv</b></td><td><span class="badge ok-badge">TRUE</span></td><td>KV Cache a 16-bit per precisione e stabilità inferenza.</td></tr>
+    <tr><td><b>release_after_inference_delay_ms</b></td><td><code>60000</code></td><td>I modelli restano in GPU/Metal per 1 minuto prima di scaricare VRAM. Riduce i tempi di riavvio.</td></tr>
+  </table>
+
+  <h2>🤖 2. Modelli Attivi e Parametri Agent (<code>~/.pi/agent/models.json</code>)</h2>
+  <p>I valori sono generati automaticamente dallo script in base a <em>"ollama ls"</em>.</p>
+  
   <table>
     <thead>
       <tr>
-        <th>Modello</th>
-        <th>Dimensione</th>
-        <th class="param">contextWindow</th>
-        <th class="param">maxTokens</th>
-        <th class="param">num_ctx</th>
-        <th class="param">temp.</th>
-        <th class="param">reasoning</th>
+        <th>Modello Installato</th>
+        <th>contextWindow<br>(Memoria Max)</th>
+        <th>maxTokens<br>(Output max)</th>
+        <th>num_ctx<br>(Caricamento VRAM)</th>
+        <th>temperature</th>
       </tr>
     </thead>
     <tbody>
-      <tr style="background-color: #3fb95022;">
-        <td><b>qwen3.6:latest</b> <em>(Default)</em></td>
-        <td>23 GB</td>
+      
+      <!-- Modelli con Reasoning Attivo -->
+      <tr style="background-color: #23863620;">
+        <td><b>qwen3.6:latest</b> <em>(Default Launch)</em></td>
         <td>131072</td>
         <td>65536</td>
-        <td>131072</td>
-        <td>0.2</td>
-        <td><span class="badge ok">YES</span></td>
+        <td>65536</td>
+        <td><code>0.2</code> (Coding/Determinista)</td>
       </tr>
       <tr>
         <td><b>qwen3-coder:latest</b></td>
-        <td>18 GB</td>
         <td>131072</td>
         <td>65536</td>
-        <td>131072</td>
-        <td>0.2</td>
-        <td><span class="badge ok">YES</span></td>
-      </tr>
-      <tr>
-        <td><b>qwen3-coder:30b</b></td>
-        <td>18 GB</td>
-        <td>32768</td>
-        <td>32768</td>
-        <td>32768</td>
-        <td>0.2</td>
-        <td><span class="badge ok">YES</span></td>
+        <td>65536</td>
+        <td><code>0.2</code> (Coding/Determinista)</td>
       </tr>
       <tr>
         <td><b>ornith:35b-q4_K_M</b></td>
-        <td>21 GB</td>
         <td>131072</td>
         <td>32768</td>
         <td>65536</td>
-        <td>0.2</td>
-        <td><span class="badge ok">YES</span></td>
+        <td><code>0.2</code> (Coding/Determinista)</td>
       </tr>
       <tr>
         <td><b>deepseek-r1:32b</b></td>
-        <td>19 GB</td>
         <td>131072</td>
         <td>8192</td>
         <td>131072</td>
-        <td>0.2</td>
-        <td><span class="badge ok">YES</span></td>
+        <td><code>0.2</code> (Reasoning Puro)</td>
       </tr>
+      
+      <!-- Modelli Vision/Multimodali -->
       <tr>
         <td><b>llama3.2-vision:latest</b></td>
-        <td>7.8 GB</td>
         <td>32768</td>
         <td>4096</td>
         <td>32768</td>
-        <td>0.5</td>
-        <td><span class="badge info">NO</span></td>
+        <td><code>0.5</code> (Vision/Flessibile)</td>
       </tr>
       <tr>
         <td><b>qwen3-vl:latest</b></td>
-        <td>6.1 GB</td>
         <td>131072</td>
         <td>8192</td>
         <td>65536</td>
-        <td>0.5</td>
-        <td><span class="badge info">NO</span></td>
+        <td><code>0.5</code> (Vision/Flessibile)</td>
       </tr>
       <tr>
         <td><b>glm-ocr:latest</b></td>
-        <td>2.2 GB</td>
         <td>32768</td>
         <td>4096</td>
         <td>32768</td>
-        <td>0.5</td>
-        <td><span class="badge info">NO</span></td>
+        <td><code>0.5</code> (Vision/Flessibile)</td>
       </tr>
+
     </tbody>
   </table>
 
-  <h4>Note sui parametri chiave:</h4>
-  <ul>
-    <li><b>input</b>: <code>["text"]</code> per testuale, <code>["text", "image"]</code> per vision (LLaMA3.2, Qwen3-VL, GLM-OCR)</li>
-    <li><b>reasoning</b>: true per modelli con ragionamento attivo (Qwen3, DeepSeek R1, Ornith)</li>
-    <li><b>num_ctx</b>: context window dinamica per ogni modello, mai inferiore a 32K dove possibile</li>
-    <li><b>temperature</b>: <code>0.2</code> per coding (consistente e deterministico), <code>0.5</code> per vision (più flessibile)</li>
-    <li><b>top_p</b>: 0.9 standard per tutti i modelli — bilanciamento tra diversità e coerenza</li>
-    <li><b>maxTokens</b>: allineato al context window o a limiti ragionevoli specifici del modello, garantendo output lunghi senza truncature premature</li>
-  </ul>
-</div>
-
-<h2>🔧 Note sulle scelte di configurazione</h2>
-
-<div class="card">
-  <p><strong>Perché questi parametri per coding sessions lunghe?</strong></p>
-  <ul>
-    <li><b>num_ctx=131072</b>: Context window massimizzata dove possibile (48 GB RAM permettono ampi context senza swap)</li>
-    <li><b>temperature=0.2</b>: Bassa temperatura per output consistenti e replicabili — cruciale per coding</li>
-    <li><b>n. predicit = maxTokens</b>: Nessun limite artificioso all'output — i modelli possono generare quanto necessario</li>
-    <li><b>use_mlock=false</b>: macOS deve condividere la memoria tra process; il blocco VRAM causerebbe OOM su 48GB</li>
-    <li><b>release_after_inference_delay=60s</b>: I modelli rimangono in VRAM per 1 minuto — riduce il tempo di loading quando si switcha velocemente tra progetti</li>
-  </ul>
-</div>
-
-<h2>🌐 Deployment Git</h2>
-
-<div class="card">
-  <p>Tutti i file sono pronti per il deploy.</p>
-  
-  <h3>Rappresentativi (remotes):</h3>
-  <table>
-    <thead><tr><th>Repository</th><th>URL</th><th>Stato configurato</th></tr></thead>
-    <tbody>
+  <h2>📖 Appendice: Glossario Tecnico (num_predict e limiti hardware)</h2>
+  <div class="param-desc">
+    <p><code>contextWindow</code>: La capienza totale di memoria "logica" in cui il modello può vedere le informazioni. Impostato a 131k token su modelli moderni.</p>
+    <p><code>num_ctx</code>: I byte fisici caricati nella scheda video/Metal. Ampiamente più stabile su Mac M4 se bilanciato (65536 tokens) per evitare OOM in sessioni estese.</p>
+    
+    <h3>Approfondimento: L'opzione <code>num_predict</code></h3>
+    <table>
+      <tr><th>Parametro</th><th>Cos'è tecnicamente?</th><th>Perché è impostato così su Impostazioni_PC?</th></tr>
       <tr>
-        <td>IFAC CNR GitLab</td>
-        <td><code>https://git.ifac.cnr.it/priori/impostazioni_pc</code></td>
-        <td><span class="badge ok">Inviato ✅</span></td>
+        <td><code>num_predict</code></td>
+        <td>Il tetto massimo di token che il modello è autorizzato a produrre durante l'inferenza.</td>
+        <td>Allineato a <code>maxTokens</code> (es. 65k). Con questo valore alto, Ollama non taglierà a metà la generazione di codice complesso come classi o metodologie complete, ottimizzando le sessioni lunghe su Mac M4.</td>
       </tr>
-      <tr>
-        <td>GitHub (Saverio68)</td>
-        <td><code>https://github.com/Saverio68/Impostazioni_PC.git</code></td>
-        <td><span class="badge ok">Inviato ✅</span></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  <h3>.gitignore incluso:</h3>
-  <pre>
-# Ollama data (non versionare i modelli!)
-~/.ollama/models/
-~/.ollama/cache/
+    </table>
+  </div>
 
-# Files di configurazione locali sensibili
-~/.pi/ollama-server-config.json
-~/.pi/config/*.json
-
-# macOS
-.DS_Store
-.AppleDouble
-.LSOverride
-
-# IDE
-.vscode/
-.idea/
-*.swp
-*.swo
-
-# System
-node_modules/
-dist/</pre>
 </div>
 
-<h2 style="margin-top: 40px; text-align: center; color: #8b949e;">
-  Configuraioni generate automaticamente per Impostazioni_PC — Mac M4 48GB<br>
-  <em>s.priori@ifac.cnr.it · Luglio 2025</em>
-</h2>
+<footer>
+  Configurazioni generate per Impostazioni_PC — s.priori@ifac.cnr.it • Luglio 2026<br>
+  <em>La configurazione hardware attuale (Mac M4 48GB) permette di ignorare i limiti default Ollama in sicurezza.</em>
+</footer>
 
 </body>
 </html>
